@@ -24,7 +24,11 @@ function master(cfg)
 	stats.startStatsTask{txDevices = {txDev}}
 	for i = 1, cfg.threads do
 		local rateLimiter = limiter:new(txDev:getTxQueue(i - 1), "poisson", 1000 / cfg.rate / cfg.threads)
-		mg.startTask("loadSlave", rateLimiter, txDev, i)
+		if i == cfg.threads then
+			loadSlave(rateLimiter, txDev, i)
+		else
+			mg.startTask("loadSlave", rateLimiter, txDev, i)
+		end
 	end
 	mg.waitForTasks()
 end
